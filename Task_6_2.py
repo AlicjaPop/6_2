@@ -1,6 +1,11 @@
+import random
+from faker import Faker
+fake=Faker()
+
 import sqlite3
 from sqlite3 import Error
 
+# Functions
 def create_connection(db_file):
     """ create a database connection to a SQLite database """
     conn = None
@@ -30,7 +35,7 @@ def add_customer(conn, customer):
     :param customer:
     :retun: customer_id
     """
-    sql='''INSERT INTO customers (customer_id, phone_number, email)
+    sql='''INSERT INTO customers (customer_id, name, email)
             VALUES(?,?,?)'''
     cur = conn.cursor()
     cur.execute(sql, customer)
@@ -44,7 +49,7 @@ def add_order(conn, order):
     :param order:
     :retun: order_number
     """
-    sql='''INSERT INTO orders (customer_id, order_number, order_value)
+    sql='''INSERT INTO orders (order_number, customer_id, order_value)
             VALUES(?,?,?)'''
     cur = conn.cursor()
     cur.execute(sql, order)
@@ -185,44 +190,71 @@ if __name__ == '__main__':
     create_customers_table="""
     CREATE TABLE IF NOT EXISTS customers (
     customer_id integer PRIMARY KEY,
-    phone_number text,
+    name text,
     email text NOT NULL
     );
     """
-
+# File path
     db_file="C:/Users/user/OneDrive/Desktop/Kodilla/6_2/Task_6_2_database.db"
 
+# Connection
     conn=create_connection(db_file)
 
     if conn is not None:
-        
+
+# Tables creation
         execute_sql(conn, create_orders_table)
         execute_sql(conn, create_customers_table)
 
-        customer_1=(1, "+48123123123", "a@a.pl")
-        customer_2=(2, "+48234234234", "b@b.pl")
-        customer_3=(3, "+48345345345", "c@c.pl")
 
-        order_1=(1,3,230.55)
-        order_2=(2,2,450.12)
-        order_3=(3,1,660.76)
+# Tables fill-out
 
-        add_order(conn, order_1)
-        add_order(conn, order_2)
-        add_order(conn, order_3)
+        for i in range(10):
+            customer_id=i+1
+            name=str(fake.name())
+            email=str(fake.email())
+            customer=(customer_id, name, email)
+            add_customer(conn, customer)
 
-        add_customer(conn, customer_1)
-        add_customer(conn, customer_2)
-        add_customer(conn, customer_3)
+        for i in range(10):
+            order_number=i+1
+            customer_id=random.randint(1,10)
+            order_value=float(random.randint(100,200))
+            order=(order_number, customer_id, order_value)
+            add_order(conn, order)
 
+
+        customer_11=(11, str(fake.name()), str(fake.email()))
+        customer_12=(12, str(fake.name()), str(fake.email()))
+        customer_13=(13, str(fake.name()), str(fake.email()))
+
+        order_11=(11,3,230.55)
+        order_12=(12,2,450.12)
+        order_13=(13,1,660.76)
+
+# Adding records
+
+        add_order(conn, order_11)
+        add_order(conn, order_12)
+        add_order(conn, order_13)
+
+        add_customer(conn, customer_11)
+        add_customer(conn, customer_12)
+        add_customer(conn, customer_13)
+
+# Filtering
         print(all_records(conn, "orders"))
         print(filter(conn, "orders", order_number=1))
+
+# Records update
 
         update_order(conn, 3, order_value=765.98)
         update_customer(conn, 1, email="aaa@aaa.pl")
 
         print(filter(conn, "orders", order_number=3))
         print(filter(conn, "customers", customer_id=1))
+
+# Records deletion
 
         delete_customer(conn, customer_id=1)
         delete_order(conn, order_number=2)

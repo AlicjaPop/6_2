@@ -44,7 +44,7 @@ def add_order(conn, order):
     :param order:
     :retun: order_number
     """
-    sql='''INSERT INTO orders (customer_id, order_number, email)
+    sql='''INSERT INTO orders (customer_id, order_number, order_value)
             VALUES(?,?,?)'''
     cur = conn.cursor()
     cur.execute(sql, order)
@@ -71,8 +71,28 @@ if __name__ == '__main__':
     """
 
     db_file="C:/Users/user/OneDrive/Desktop/Kodilla/6_2/Task_6_2_database.db"
+
     conn=create_connection(db_file)
+
     if conn is not None:
+        
         execute_sql(conn, create_orders_table)
         execute_sql(conn, create_customers_table)
+
+        customer_1=(1, "+48123123123", "a@a.pl")
+        customer_2=(2, "+48234234234", "b@b.pl")
+        customer_3=(3, "+48345345345", "c@c.pl")
+
+        order_1=(9,1,230.55)
+        order_2=(8,2,450.12)
+        order_3=(7,3,660.76)
+
+        add_order(conn, order_1)
+        add_order(conn, order_2)
+        add_order(conn, order_3)
+
+        add_customer(conn, customer_1)
+        add_customer(conn, customer_2)
+        add_customer(conn, customer_3)
+
         conn.close()

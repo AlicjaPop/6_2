@@ -129,6 +129,48 @@ def update_order(conn, order_number, **kwargs):
    except sqlite3.OperationalError as e:
        print(e)
 
+def delete_customer(conn, **kwargs):
+   """
+   Delete from table where attributes from
+   :param conn:  Connection to the SQLite database
+   :param table: table name
+   :param kwargs: dict of attributes and values
+   :return:
+   """
+   qs = []
+   values = tuple()
+   for k, v in kwargs.items():
+       qs.append(f"{k}=?")
+       values += (v,)
+   q = " AND ".join(qs)
+
+   sql = f'DELETE FROM customers WHERE {q}'
+   cur = conn.cursor()
+   cur.execute(sql, values)
+   conn.commit()
+   print("Deleted")
+
+def delete_order(conn, **kwargs):
+   """
+   Delete from table where attributes from
+   :param conn:  Connection to the SQLite database
+   :param table: table name
+   :param kwargs: dict of attributes and values
+   :return:
+   """
+   qs = []
+   values = tuple()
+   for k, v in kwargs.items():
+       qs.append(f"{k}=?")
+       values += (v,)
+   q = " AND ".join(qs)
+
+   sql = f'DELETE FROM orders WHERE {q}'
+   cur = conn.cursor()
+   cur.execute(sql, values)
+   conn.commit()
+   print("Deleted")
+
 if __name__ == '__main__':
 
     create_orders_table="""
@@ -181,6 +223,12 @@ if __name__ == '__main__':
 
         print(filter(conn, "orders", order_number=3))
         print(filter(conn, "customers", customer_id=1))
+
+        delete_customer(conn, customer_id=1)
+        delete_order(conn, order_number=2)
+
+        print(all_records(conn, "orders"))
+        print(all_records(conn, "customers"))
 
 
         conn.close()
